@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a2e1b">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Shop Ledger Pro</title>
+<style>
+:root{
+  --bg:#f7f3ee;--surface:#fff;--dark:#1a2e1b;--green:#2d6a4f;--green2:#40916c;
+  --amber:#b5632a;--amber2:#7c3f00;--red:#c0392b;--blue:#2563eb;
+  --text:#2d3a2e;--muted:#9a8878;--border:#d4c4a8;--card:#fff8f0;
+  --wa:#25D366;--radius:12px;--shadow:0 2px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:520px;margin:0 auto;}
+
+/* Topbar */
+.topbar{background:var(--dark);color:#f0e6d3;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.topbar-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;}
+.topbar-actions{display:flex;gap:6px;}
+.icon-btn{background:rgba(255,255,255,.1);border:none;color:#f0e6d3;cursor:pointer;font-size:13px;padding:6px 10px;border-radius:8px;}
+.icon-btn:active{background:rgba(255,255,255,.2);}
+.pro-badge{background:#4f46e5;color:#fff;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;}
+.role-chip{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;}
+.role-owner{background:#fde68a;color:#78350f;}
+.role-manager{background:#d1fae5;color:#065f46;}
+.role-staff{background:#e0e7ff;color:#3730a3;}
+
+/* Login */
+.login-wrap{min-height:100vh;background:linear-gradient(160deg,#1a2e1b,#3b2a14);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:14px;}
+.login-card{background:var(--bg);border-radius:20px;padding:36px 28px;width:100%;max-width:360px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.login-card h1{margin:14px 0 4px;font-size:26px;color:var(--dark);}
+.login-card p{color:var(--amber);font-style:italic;margin-bottom:24px;}
+.powered{color:rgba(255,255,255,.3);font-size:11px;}
+
+/* Setup screen */
+.setup-card{background:var(--bg);border-radius:20px;padding:28px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.setup-card h2{color:var(--dark);font-size:20px;margin-bottom:4px;}
+.setup-card p{color:var(--muted);font-size:13px;margin-bottom:18px;}
+
+/* Inputs */
+input,select,textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;background:var(--card);margin-bottom:12px;color:var(--text);font-family:inherit;outline:none;}
+input:focus,select:focus{border-color:var(--green);}
+label{display:block;font-size:12px;font-weight:700;color:var(--amber2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;}
+
+/* Buttons */
+.btn{display:block;width:100%;padding:12px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s;}
+.btn:active{opacity:.85;}
+.btn-primary{background:var(--green);color:#fff;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-amber{background:var(--amber);color:#fff;}
+.btn-ghost{background:#e8e0d5;color:#4a3728;}
+.btn-green{background:#1e8449;color:#fff;}
+.btn-blue{background:#2563eb;color:#fff;}
+.row-btns{display:flex;gap:8px;}
+.row-btns .btn{flex:1;}
+.btn-wa{background:var(--wa);color:#fff;display:inline-flex;align-items:center;gap:6px;text-decoration:none;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:700;}
+.btn-wa-sm{font-size:12px;padding:5px 10px;}
+.btn-icon{background:#f0e6d3;border:none;color:#4a3728;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;}
+.btn-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:12px;padding:0;margin-top:8px;}
+.btn-add{padding:10px 16px;background:var(--amber);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;}
+
+/* Content */
+.content{padding:14px 14px 80px;}
+
+/* Summary cards */
+.card-row{display:flex;gap:10px;margin-bottom:10px;}
+.sum-card{flex:1;border-radius:14px;padding:14px 12px;color:#fff;}
+.sum-card.full{flex:1 1 100%;}
+.sum-card .lbl{font-size:11px;opacity:.85;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.sum-card .val{font-size:22px;font-weight:800;margin-bottom:2px;}
+.sum-card .sub{font-size:11px;opacity:.7;}
+.card-debt{background:linear-gradient(135deg,#c0392b,#e74c3c);}
+.card-credit{background:linear-gradient(135deg,#1e8449,#27ae60);}
+.card-total{background:linear-gradient(135deg,#7c3f00,#b5632a);}
+
+/* Sync bar */
+.sync-bar{background:#e8fdf0;border:1.5px solid #27ae60;border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;}
+.sync-bar .t1{font-size:13px;font-weight:700;color:#1a3c2a;}
+.sync-bar .t2{font-size:11px;color:var(--green);}
+.btn-sync{padding:7px 14px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+
+/* Search */
+.search-row{display:flex;gap:10px;margin-bottom:12px;align-items:center;}
+.search-box{flex:1;display:flex;align-items:center;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;gap:8px;}
+.search-box input{border:none;background:transparent;margin:0;padding:0;font-size:15px;flex:1;outline:none;}
+
+/* Customer cards */
+.customer-list{display:flex;flex-direction:column;gap:10px;}
+.customer-card{background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid #ede0cc;}
+.customer-top{padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.customer-top:active{background:#fdf6ec;}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0;}
+.customer-name{font-weight:700;font-size:15px;color:var(--dark);margin:0;}
+.customer-sub{font-size:12px;color:var(--muted);margin:2px 0 0;}
+.customer-amt{text-align:right;flex-shrink:0;}
+.customer-amt .debt-val{font-weight:800;font-size:16px;}
+.customer-amt .debt-lbl{font-size:11px;color:var(--muted);}
+.customer-bottom{padding:8px 15px 10px;border-top:1px solid #f5ede0;display:flex;align-items:center;background:#fdf9f4;gap:8px;}
+.overdue-chip{background:#fde8e8;color:#c0392b;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;}
+
+/* Section head */
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #ede0cc;}
+.section-title{font-size:15px;color:#4a3728;font-weight:700;}
+
+/* Customer sheet */
+.cust-header{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);}
+.cust-header-top{display:flex;align-items:flex-start;gap:14px;}
+.big-avatar{width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;flex-shrink:0;}
+.cust-header-info{flex:1;min-width:0;}
+.outstanding-lbl{font-size:15px;font-weight:700;margin:2px 0 4px;}
+.editable-val{font-size:13px;color:#4a3728;cursor:pointer;border-bottom:1px dashed var(--border);padding-bottom:1px;display:inline-block;}
+
+/* WA banner */
+.wa-banner{background:linear-gradient(135deg,#e8fdf0,#d5f5e3);border:1.5px solid var(--wa);border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.wa-info .t1{font-weight:700;font-size:14px;color:#1a3c2a;}
+.wa-info .t2{font-size:12px;color:var(--green);margin-top:2px;}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;margin-bottom:12px;}
+.tab{flex:1;padding:9px 4px;background:#e8e0d5;border:none;border-radius:10px;font-size:12px;cursor:pointer;color:#4a3728;font-family:inherit;font-weight:600;}
+.tab.active{background:var(--green);color:#fff;}
+
+/* Transactions */
+.tx-card{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.tx-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.tx-date{font-size:12px;color:var(--muted);}
+.tx-by{font-size:11px;color:#aaa;margin-top:4px;}
+.badge{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;}
+.badge-debt{background:#fde8e8;color:var(--red);}
+.badge-credit{background:#e8fdf0;color:#1e8449;}
+.tx-items{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+.item-tag{background:#f0e6d3;border-radius:20px;padding:3px 10px;font-size:12px;color:#4a3728;}
+.tx-note{font-size:13px;color:#7a6045;}
+
+/* Form box */
+.form-box{background:#fff;border-radius:14px;padding:16px;box-shadow:var(--shadow);}
+.form-title{font-size:17px;color:var(--dark);font-weight:700;margin-bottom:14px;}
+.item-row{display:flex;gap:6px;margin-bottom:8px;align-items:center;}
+.item-row input{margin:0;flex:1;}
+.item-row input:nth-child(2){flex:.6;}
+.debt-total{text-align:right;font-size:16px;color:var(--dark);margin:10px 0;font-weight:600;}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;}
+.modal{background:var(--bg);border-radius:16px;padding:24px 20px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto;}
+.modal h3{margin-bottom:16px;color:var(--dark);font-size:17px;}
+.modal-row{display:flex;gap:8px;margin-top:8px;}
+.modal-row .btn{flex:1;}
+
+/* Flash */
+.flash{border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:14px;border:1px solid;}
+.flash-ok{background:#d5f5e3;border-color:#27ae60;color:#1e8449;}
+.flash-err{background:#fde8e8;border-color:var(--red);color:var(--red);}
+
+/* Empty */
+.empty{text-align:center;padding:40px 20px;color:var(--muted);font-style:italic;}
+
+/* Loading spinner */
+.spinner{display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Sort buttons */
+.sort-bar{display:flex;gap:6px;margin-bottom:12px;}
+.sort-btn{padding:6px 12px;background:#e8e0d5;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;color:#4a3728;font-weight:600;}
+.sort-btn.active{background:var(--green);color:#fff;}
+
+/* Settings */
+.settings-section{margin-bottom:24px;}
+.cur-btn{padding:7px 12px;background:#e8e0d5;color:#4a3728;border:1.5px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;}
+.cur-btn.active{background:var(--green);color:#fff;border-color:var(--green);}
+.currency-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.user-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0e6d3;}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;flex-shrink:0;}
+.user-info{flex:1;}
+.user-info .uname{font-weight:700;color:var(--dark);font-size:14px;}
+.user-actions{display:flex;gap:6px;}
+
+/* Audit log */
+.audit-row{padding:8px 0;border-bottom:1px solid #f0e6d3;font-size:13px;}
+.audit-action{font-weight:700;color:var(--dark);}
+.audit-meta{color:var(--muted);font-size:11px;margin-top:2px;}
+
+/* Reports */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-card{background:#fff;border-radius:10px;padding:14px;box-shadow:var(--shadow);}
+.stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.stat-val{font-size:20px;font-weight:800;margin-top:4px;}
+
+/* Bottom nav */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:var(--dark);display:flex;border-top:1px solid rgba(255,255,255,.1);z-index:40;}
+.nav-btn{flex:1;padding:10px 4px 12px;background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-family:inherit;}
+.nav-btn.active{color:#fff;}
+.nav-icon{font-size:20px;}
+
+/* Offline banner */
+.offline-bar{background:#e67e22;color:#fff;text-align:center;font-size:12px;padding:6px;font-weight:700;display:none;}
+body.offline .offline-bar{display:block;}
+
+@media print{
+  .topbar,.bottom-nav,.tabs,.btn-add,.search-row,.customer-bottom,.no-print{display:none!important;}
+  body{background:#fff;max-width:100%;}
+  .content{padding:0;}
+}
+</style>
+</head>
+<body>
+<div class="offline-bar">⚠️ You are offline — showing cached data</div>
+<div id="app"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  SHOP LEDGER PRO v3.0 — Multi-User | Cloud Sync
+//  © 2025 Shop Ledger Pro. All rights reserved.
+// ══════════════════════════════════════════════════════════
+
+const API = './api.php';
+const SESSION_KEY = 'slp_session';
+
+// ── Utilities ─────────────────────────────────────────────
+const el = (tag,cls,html) => { const e=document.createElement(tag); if(cls)e.className=cls; if(html!==undefined)e.innerHTML=html; return e; };
+const qs = s => document.querySelector(s);
+const todayStr = () => new Date().toISOString().split('T')[0];
+const fmtDate = d => new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+const fmtDateTime = d => new Date(d).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+const money = (n,sym) => `${sym}${Number(n||0).toFixed(2)}`;
+const cleanPhone = r => r?r.replace(/\D/g,''):'';
+const waUrl = (phone,name,amt,shop,sym) => {
+  const n=cleanPhone(phone); if(!n)return null;
+  return `https://wa.me/${n}?text=${encodeURIComponent(`Assalam-o-Alaikum ${name},\n\nReminder from *${shop}*.\n\nOutstanding balance: *${money(amt,sym)}*\n\nPlease clear your dues at your earliest.\n\nJazakAllah Khair 🙏`)}`;
+};
+const WA_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
+
+// ── API call ───────────────────────────────────────────────
+async function api(action, body={}) {
+  const sess = getSession();
+  try {
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(sess ? {'X-Session-Token': sess.token} : {})
+      },
+      body: JSON.stringify({action, ...body})
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    return data;
+  } catch(e) {
+    if (!navigator.onLine) throw new Error('You are offline. Please check your internet connection.');
+    throw e;
+  }
+}
+
+// ── Session management ─────────────────────────────────────
+function getSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch{ return null; } }
+function setSession(s) { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+// ── State ──────────────────────────────────────────────────
+let session = getSession();
+let currentView = session ? 'dashboard' : 'login';
+let activeCustomerId = null;
+let customers = [];
+let syncInterval = null;
+let sortMode = 'name';
+
+// ── Offline detection ──────────────────────────────────────
+window.addEventListener('online',  () => { document.body.classList.remove('offline'); loadCustomers(); });
+window.addEventListener('offline', () => document.body.classList.add('offline'));
+
+// ── Navigation ─────────────────────────────────────────────
+function nav(view, custId=null) {
+  currentView = view;
+  activeCustomerId = custId;
+  render();
+}
+
+// ── Main render ────────────────────────────────────────────
+function render() {
+  const app = qs('#app'); app.innerHTML = '';
+  if (currentView === 'setup')     { app.appendChild(renderSetup()); return; }
+  if (currentView === 'login')     { app.appendChild(renderLogin()); return; }
+  app.appendChild(renderTopBar());
+  const content = el('div','content');
+  if (currentView === 'dashboard') content.appendChild(renderDashboard());
+  if (currentView === 'customer')  content.appendChild(renderCustomerSheet());
+  if (currentView === 'reports')   content.appendChild(renderReports());
+  if (currentView === 'settings')  content.appendChild(renderSettings());
+  if (currentView === 'users')     content.appendChild(renderUsers());
+  if (currentView === 'audit')     content.appendChild(renderAudit());
+  app.appendChild(content);
+  app.appendChild(renderBottomNav());
+}
+
+// ── SETUP SCREEN ───────────────────────────────────────────
+function renderSetup() {
+  const wrap = el('div','login-wrap');
+  const card = el('div','setup-card');
+  card.innerHTML = `<h2>🏪 First Time Setup</h2><p>Create your Shop Ledger Pro account</p>`;
+  const shopInp = el('input'); shopInp.placeholder='Shop name (e.g. Ahmed General Store)';
+  const userInp = el('input'); userInp.placeholder='Your username (e.g. admin)';
+  const pinInp  = el('input'); pinInp.type='password'; pinInp.placeholder='PIN (min 4 digits)';
+  const err = el('p','flash flash-err',''); err.style.display='none';
+  const btn = el('button','btn btn-primary','Create Account & Start');
+  btn.onclick = async () => {
+    err.style.display='none';
+    if (!shopInp.value.trim()) { err.textContent='Enter shop name'; err.style.display='block'; return; }
+    if (!userInp.value.trim()) { err.textContent='Enter username'; err.style.display='block'; return; }
+    if (pinInp.value.length < 4) { err.textContent='PIN must be at least 4 digits'; err.style.display='block'; return; }
+    btn.innerHTML='<span class="spinner"></span>';  btn.disabled=true;
+    try {
+      await api('setup', {shopName:shopInp.value.trim(), username:userInp.value.trim(), pin:pinInp.value});
+      alert('✅ Setup complete! Please log in now.');
+      currentView='login'; render();
+    } catch(e) { err.textContent=e.message; err.style.display='block'; btn.innerHTML='Create Account & Start'; btn.disabled=false; }
+  };
+  [shopInp,userInp,pinInp,err,btn].forEach(e=>card.appendChild(e));
+  card.appendChild(el('p','hint','Already set up? <a href="#" onclick="currentView=\'login\';render()">Login here</a>'));
+  wrap.appendChild(card);
+  wrap.appendChild(el('div','powered','Shop Ledger Pro · Secure Cloud Sync'));
+  return wrap;
+}
+
+// ── LOGIN ──────────────────────────────────────────────────
+function renderLogin() {
+  const wrap = el('div','login-wrap');
+  const card = el('div','login-card');
+  card.innerHTML = `<svg width="64" height="64" viewBox="0 0 64 64" fill="none"><rect x="8" y="14" width="48" height="10" rx="2" fill="#b5632a"/><rect x="10" y="24" width="44" height="28" rx="2" fill="#2d6a4f"/><rect x="27" y="36" width="10" height="16" rx="2" fill="#fdf6ec"/><rect x="14" y="28" width="10" height="8" rx="1" fill="#fdf6ec" opacity=".9"/><rect x="40" y="28" width="10" height="8" rx="1" fill="#fdf6ec" opacity=".9"/></svg><h1>Shop Ledger Pro</h1><p>Secure Credit Ledger</p>`;
+  const userInp = el('input'); userInp.placeholder='Username'; userInp.autocomplete='username';
+  const pinInp  = el('input'); pinInp.type='password'; pinInp.placeholder='PIN'; pinInp.autocomplete='current-password';
+  const err = el('p',''); err.style.cssText='color:#e74c3c;font-size:13px;margin-bottom:8px;min-height:18px;';
+  const btn = el('button','btn btn-primary','🔒 Sign In');
+  let attempts = 0, lockUntil = 0;
+  const tryLogin = async () => {
+    const now = Date.now();
+    if (lockUntil > now) { err.textContent=`Too many attempts. Wait ${Math.ceil((lockUntil-now)/1000)}s.`; return; }
+    btn.innerHTML='<span class="spinner"></span>'; btn.disabled=true; err.textContent='';
+    try {
+      const data = await api('login', {username:userInp.value.trim(), pin:pinInp.value});
+      setSession(data);
+      session = data;
+      attempts = 0;
+      await loadCustomers();
+      currentView='dashboard'; render();
+      startSync();
+    } catch(e) {
+      attempts++;
+      if (attempts >= 5) { lockUntil=Date.now()+30000; attempts=0; }
+      err.textContent = e.message + (attempts>=3 ? ` (${5-attempts} attempts left)` : '');
+      btn.innerHTML='🔒 Sign In'; btn.disabled=false;
+    }
+  };
+  btn.onclick = tryLogin;
+  pinInp.onkeydown = e => { if(e.key==='Enter') tryLogin(); };
+  const setupLink = el('p','hint','');
+  setupLink.innerHTML='First time? <a href="#" style="color:var(--green)">Setup your account</a>';
+  setupLink.querySelector('a').onclick = e => { e.preventDefault(); currentView='setup'; render(); };
+  [userInp,pinInp,err,btn,setupLink].forEach(e=>card.appendChild(e));
+  wrap.appendChild(card);
+  wrap.appendChild(el('div','powered','Shop Ledger Pro · © 2025 All rights reserved'));
+  return wrap;
+}
+
+// ── Topbar ─────────────────────────────────────────────────
+function renderTopBar() {
+  const bar = el('div','topbar');
+  if (currentView !== 'dashboard') {
+    const back = el('button','icon-btn','← Back');
+    back.onclick = () => nav('dashboard');
+    bar.appendChild(back);
+    const title = el('span','',currentView==='customer'?'Customer Ledger':currentView==='settings'?'Settings':currentView==='users'?'User Management':currentView==='audit'?'Audit Log':'Reports');
+    title.style.cssText='font-weight:700;font-size:15px;';
+    bar.appendChild(title);
+  } else {
+    const title = el('div','topbar-title');
+    title.innerHTML=`🏪 <span>${session?.bizName||'Shop Ledger'}</span> <span class="pro-badge">PRO</span>`;
+    bar.appendChild(title);
+  }
+  const actions = el('div','topbar-actions');
+  const roleChip = el('span',`role-chip role-${session?.role||'staff'}`,session?.role||'');
+  actions.appendChild(roleChip);
+  const logout = el('button','icon-btn','🚪');
+  logout.onclick = async () => { try { await api('logout'); } catch{} clearSession(); session=null; stopSync(); currentView='login'; render(); };
+  actions.appendChild(logout);
+  bar.appendChild(actions);
+  return bar;
+}
+
+// ── Bottom nav ─────────────────────────────────────────────
+function renderBottomNav() {
+  const nav_el = el('div','bottom-nav');
+  const items = [
+    {id:'dashboard',icon:'🏠',label:'Home'},
+    {id:'reports',icon:'📊',label:'Reports'},
+  ];
+  if (session?.role === 'owner' || session?.role === 'manager') {
+    items.push({id:'users',icon:'👥',label:'Users'});
+  }
+  items.push({id:'settings',icon:'⚙️',label:'Settings'});
+  items.forEach(item => {
+    const btn = el('button',`nav-btn${currentView===item.id?' active':''}`,`<span class="nav-icon">${item.icon}</span>${item.label}`);
+    btn.onclick = () => nav(item.id);
+    nav_el.appendChild(btn);
+  });
+  return nav_el;
+}
+
+// ── Load customers from server ──────────────────────────────
+async function loadCustomers() {
+  try {
+    const data = await api('getCustomers');
+    customers = data.customers || [];
+    // Cache locally for offline
+    localStorage.setItem('slp_customers_cache', JSON.stringify(customers));
+  } catch(e) {
+    // Try cache if offline
+    const cached = localStorage.getItem('slp_customers_cache');
+    if (cached) customers = JSON.parse(cached);
+  }
+}
+
+// ── Auto-sync every 30 seconds ─────────────────────────────
+function startSync() {
+  stopSync();
+  syncInterval = setInterval(async () => {
+    if (currentView === 'dashboard' || currentView === 'customer') {
+      await loadCustomers();
+      if (currentView === 'dashboard') renderDashboardContent();
+    }
+  }, 30000);
+}
+function stopSync() { if(syncInterval) clearInterval(syncInterval); }
+
+// ── Dashboard ───────────────────────────────────────────────
+let dashContent = null;
+function renderDashboard() {
+  const wrap = el('div');
+  dashContent = wrap;
+  renderDashboardContent(wrap);
+  return wrap;
+}
+
+function renderDashboardContent(wrap=dashContent) {
+  if(!wrap) return;
+  wrap.innerHTML='';
+  const sym = session?.currency||'₨';
+  const today = todayStr();
+  const todayDebt   = customers.reduce((s,c)=>s+(c.transactions||[]).filter(t=>t.tx_date===today&&t.type==='debt').reduce((a,t)=>a+parseFloat(t.amount),0),0);
+  const todayCredit = customers.reduce((s,c)=>s+(c.transactions||[]).filter(t=>t.tx_date===today&&t.type==='credit').reduce((a,t)=>a+parseFloat(t.amount),0),0);
+  const grandTotal  = customers.reduce((s,c)=>s+parseFloat(c.outstanding||0),0);
+  const overdue     = customers.filter(c=>daysOverdue(c)>7&&parseFloat(c.outstanding)>0).length;
+
+  // Cards
+  const row1 = el('div','card-row');
+  row1.innerHTML=`<div class="sum-card card-debt"><div class="lbl">Today Debt</div><div class="val">${money(todayDebt,sym)}</div><div class="sub">${today}</div></div><div class="sum-card card-credit"><div class="lbl">Today Credit</div><div class="val">${money(todayCredit,sym)}</div><div class="sub">${today}</div></div>`;
+  const row2 = el('div','card-row');
+  row2.innerHTML=`<div class="sum-card card-total full"><div class="lbl">Total Outstanding${overdue>0?` &nbsp;·&nbsp; <span style="color:#fecaca">${overdue} overdue</span>`:''}</div><div class="val">${money(grandTotal,sym)}</div><div class="sub">${customers.length} customers · Last synced: ${new Date().toLocaleTimeString()}</div></div>`;
+  wrap.appendChild(row1); wrap.appendChild(row2);
+
+  // Sync bar
+  const sbar = el('div','sync-bar');
+  sbar.innerHTML=`<div><div class="t1">🟢 Live Cloud Sync</div><div class="t2">Data synced every 30 seconds across all devices</div></div>`;
+  const refreshBtn = el('button','btn-sync','🔄 Refresh');
+  refreshBtn.onclick = async () => { refreshBtn.textContent='⏳'; await loadCustomers(); renderDashboardContent(); };
+  const printBtn = el('button','btn-sync','🖨️ Print');
+  printBtn.style.background='#2563eb'; printBtn.style.marginRight='6px';
+  printBtn.onclick = () => printLedger();
+  sbar.appendChild(printBtn); sbar.appendChild(refreshBtn);
+  wrap.appendChild(sbar);
+
+  // Search + Add
+  const srow = el('div','search-row');
+  const sbox = el('div','search-box','<span>🔍</span>');
+  const sInp = el('input'); sInp.placeholder='Search customer…'; sInp.style.cssText='border:none;background:transparent;margin:0;padding:0;font-size:15px;flex:1;outline:none;';
+  sbox.appendChild(sInp);
+  srow.appendChild(sbox);
+  if (canDo('add_customer')) {
+    const addBtn = el('button','btn-add','➕ New');
+    addBtn.onclick = () => showAddCustomerModal();
+    srow.appendChild(addBtn);
+  }
+  wrap.appendChild(srow);
+
+  // Sort
+  const sortBar = el('div','sort-bar');
+  [['name','A-Z'],['debt','Highest Debt'],['overdue','Overdue']].forEach(([id,lbl])=>{
+    const b=el('button',`sort-btn${sortMode===id?' active':''}`,lbl);
+    b.onclick=()=>{sortMode=id;renderDashboardContent();};
+    sortBar.appendChild(b);
+  });
+  wrap.appendChild(sortBar);
+
+  // Customer list
+  const list = el('div','customer-list');
+  sInp.oninput = () => {
+    const q=sInp.value.toLowerCase();
+    list.querySelectorAll('.customer-card').forEach(card=>{
+      card.style.display=card.dataset.name.toLowerCase().includes(q)?'':'none';
+    });
+  };
+  let sorted = [...customers];
+  if (sortMode==='debt') sorted.sort((a,b)=>parseFloat(b.outstanding)-parseFloat(a.outstanding));
+  else if (sortMode==='overdue') sorted.sort((a,b)=>daysOverdue(b)-daysOverdue(a));
+  else sorted.sort((a,b)=>a.name.localeCompare(b.name));
+  if (!sorted.length) list.appendChild(el('div','empty','No customers yet. Add your first customer!'));
+  sorted.forEach(c => list.appendChild(buildCustomerCard(c,sym)));
+  wrap.appendChild(list);
+}
+
+function daysOverdue(c) {
+  if (!c.transactions?.length || parseFloat(c.outstanding)<=0) return 0;
+  const last = c.transactions[c.transactions.length-1].tx_date;
+  return Math.floor((Date.now()-new Date(last+'T00:00:00'))/(1000*60*60*24));
+}
+
+function buildCustomerCard(c,sym) {
+  const card = el('div','customer-card'); card.dataset.name=c.name;
+  const top = el('div','customer-top');
+  const av = el('div','avatar',c.name[0].toUpperCase());
+  const days = daysOverdue(c);
+  const overdueTag = days>7&&parseFloat(c.outstanding)>0?`<span class="overdue-chip">${days}d overdue</span>`:'';
+  const info = el('div',``,`<p class="customer-name">${c.name} ${overdueTag}</p><p class="customer-sub">${c.phone?'📞 '+c.phone:'No phone'} · Txns: ${(c.transactions||[]).length}</p>`);
+  info.style.flex='1';
+  const amt = parseFloat(c.outstanding);
+  const amtDiv = el('div','customer-amt',`<div class="debt-val" style="color:${amt>0?'#c0392b':'#27ae60'}">${money(amt,sym)}</div><div class="debt-lbl">${amt>0?'owes':'clear'}</div>`);
+  top.appendChild(av); top.appendChild(info); top.appendChild(amtDiv);
+  top.onclick = () => nav('customer', c.id);
+  card.appendChild(top);
+  const bottom = el('div','customer-bottom');
+  const waLink = c.phone ? waUrl(c.phone,c.name,c.outstanding,session?.bizName,sym) : null;
+  if (waLink && amt>0) {
+    const wa=el('a','btn-wa btn-wa-sm'); wa.href=waLink; wa.target='_blank'; wa.rel='noopener noreferrer';
+    wa.innerHTML=`${WA_SVG} Reminder`; wa.onclick=e=>e.stopPropagation();
+    bottom.appendChild(wa);
+  } else {
+    bottom.innerHTML=`<span style="font-size:11px;color:#bbb;font-style:italic">${c.phone?'Balance clear ✅':'Add phone to enable WhatsApp'}</span>`;
+  }
+  card.appendChild(bottom);
+  return card;
+}
+
+// ── Permissions ────────────────────────────────────────────
+function canDo(action) {
+  const role = session?.role;
+  const ownerOnly = ['manage_users','view_audit','delete_customer'];
+  const managerPlus = ['delete_transaction','add_customer','update_customer'];
+  if (ownerOnly.includes(action)) return role==='owner';
+  if (managerPlus.includes(action)) return role==='owner'||role==='manager';
+  return true; // staff can do rest (add_debt, add_credit)
+}
+
+// ── Add Customer Modal ──────────────────────────────────────
+function showAddCustomerModal() {
+  const bg = el('div','modal-bg');
+  const modal = el('div','modal');
+  modal.innerHTML='<h3>➕ Add New Customer</h3>';
+  const fields=[
+    {ph:'Full Name *',id:'nc-name',type:'text'},
+    {ph:'Phone (with country code e.g. 923001234567)',id:'nc-phone',type:'tel'},
+    {ph:'Address (optional)',id:'nc-addr',type:'text'},
+    {ph:'Notes (optional)',id:'nc-note',type:'text'},
+  ];
+  fields.forEach(f=>{ const i=el('input'); i.id=f.id; i.placeholder=f.ph; i.type=f.type; modal.appendChild(i); });
+  modal.appendChild(el('p','',`<small style="color:var(--muted)">Pakistan country code: 92 (no + sign)</small>`));
+  const errP = el('p','flash flash-err',''); errP.style.display='none'; modal.appendChild(errP);
+  const row = el('div','modal-row');
+  const cancel = el('button','btn btn-ghost','Cancel'); cancel.onclick=()=>bg.remove();
+  const add = el('button','btn btn-primary','Add Customer');
+  add.onclick = async () => {
+    const name = qs('#nc-name').value.trim();
+    if (!name) { errP.textContent='Name is required'; errP.style.display='block'; return; }
+    add.innerHTML='<span class="spinner"></span>'; add.disabled=true;
+    try {
+      await api('addCustomer',{name,phone:qs('#nc-phone').value.trim(),address:qs('#nc-addr').value.trim(),notes:qs('#nc-note').value.trim()});
+      await loadCustomers(); bg.remove(); renderDashboardContent();
+    } catch(e) { errP.textContent=e.message; errP.style.display='block'; add.innerHTML='Add Customer'; add.disabled=false; }
+  };
+  row.appendChild(cancel); row.appendChild(add); modal.appendChild(row);
+  bg.appendChild(modal); bg.onclick=e=>{if(e.target===bg)bg.remove();};
+  document.body.appendChild(bg);
+}
+
+// ── Customer Sheet ──────────────────────────────────────────
+function renderCustomerSheet() {
+  const c = customers.find(x=>x.id===activeCustomerId);
+  if (!c) return el('div','empty','Customer not found.');
+  const sym = session?.currency||'₨';
+  const wrap = el('div');
+
+  // Header
+  const header = el('div','cust-header');
+  const headerTop = el('div','cust-header-top');
+  const bigAv = el('div','big-avatar',c.name[0].toUpperCase());
+  const info = el('div','cust-header-info');
+  info.style.flex='1';
+  const nameEl = el('h2','',c.name); nameEl.style.cssText='font-size:19px;color:var(--dark);margin-bottom:4px;';
+  info.appendChild(nameEl);
+  const outP = el('p','outstanding-lbl','');
+  outP.style.color=parseFloat(c.outstanding)>0?'#e74c3c':'#27ae60';
+  outP.textContent=`${money(c.outstanding,sym)} ${parseFloat(c.outstanding)>0?'outstanding':'— all clear'}`;
+  info.appendChild(outP);
+  const days=daysOverdue(c);
+  if(days>0&&parseFloat(c.outstanding)>0){ const oc=el('span','overdue-chip',`⏰ ${days} days overdue`); oc.style.marginTop='4px;display:block'; info.appendChild(oc); }
+
+  // Editable fields
+  [{key:'phone',icon:'📞',ph:'WhatsApp number with country code'},{key:'address',icon:'📍',ph:'Address'},{key:'notes',icon:'📝',ph:'Notes'}].forEach(f=>{
+    const row=el('div',''); row.style.cssText='margin-top:6px;';
+    const valSpan=el('span','editable-val',c[f.key]?`${f.icon} ${c[f.key]}`:`${f.icon} (tap to add ${f.key})`);
+    if(canDo('update_customer')){
+      valSpan.onclick=()=>{
+        const inp=el('input'); inp.value=c[f.key]||''; inp.placeholder=f.ph; inp.style.cssText='font-size:13px;padding:7px 10px;margin:4px 0 0;';
+        const sv=el('button','btn btn-primary','Save'); sv.style.cssText='width:auto;padding:7px 12px;font-size:13px;margin:4px 4px 0 0;';
+        const cn=el('button','btn btn-ghost','✕'); cn.style.cssText='width:auto;padding:7px 10px;font-size:13px;margin:4px 0 0;';
+        sv.onclick=async()=>{
+          try{ await api('updateCustomer',{id:c.id,field:f.key,value:inp.value.trim()}); await loadCustomers(); nav('customer',c.id); }
+          catch(e){ alert(e.message); }
+        };
+        cn.onclick=()=>nav('customer',c.id);
+        row.innerHTML=''; row.appendChild(inp); row.appendChild(sv); row.appendChild(cn); inp.focus();
+      };
+    }
+    row.appendChild(valSpan); info.appendChild(row);
+  });
+
+  const btnCol=el('div',''); btnCol.style.cssText='display:flex;flex-direction:column;gap:6px;flex-shrink:0;';
+  const printBtn=el('button','btn-icon','🖨️'); printBtn.title='Print'; printBtn.onclick=()=>printLedger(c.id);
+  btnCol.appendChild(printBtn);
+  if(canDo('delete_customer')){
+    const delBtn=el('button','btn-icon','🗑'); delBtn.style.cssText='background:#fde8e8;color:#c0392b;';
+    delBtn.onclick=async()=>{
+      if(!confirm(`Delete ${c.name} and all their records?`))return;
+      try{ await api('deleteCustomer',{id:c.id}); await loadCustomers(); nav('dashboard'); }
+      catch(e){ alert(e.message); }
+    };
+    btnCol.appendChild(delBtn);
+  }
+  headerTop.appendChild(bigAv); headerTop.appendChild(info); headerTop.appendChild(btnCol);
+  header.appendChild(headerTop); wrap.appendChild(header);
+
+  // WA banner
+  const waLink = c.phone?waUrl(c.phone,c.name,c.outstanding,session?.bizName,sym):null;
+  if(waLink&&parseFloat(c.outstanding)>0){
+    const wab=el('div','wa-banner');
+    wab.innerHTML=`<div class="wa-info"><div class="t1">Send Payment Reminder</div><div class="t2">Pre-filled WhatsApp message</div></div>`;
+    const wa=el('a','btn-wa'); wa.href=waLink; wa.target='_blank'; wa.rel='noopener noreferrer'; wa.innerHTML=`${WA_SVG} Send`;
+    wab.appendChild(wa); wrap.appendChild(wab);
+  }
+
+  // Tabs
+  const tabsEl=el('div','tabs');
+  const tabContent=el('div');
+  const tabDefs=[['history','📋 History'],['addDebt','📌 Add Debt'],['addCredit','✅ Credit']];
+  function switchTab(t){
+    tabsEl.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',tabDefs[i][0]===t));
+    tabContent.innerHTML='';
+    if(t==='history') tabContent.appendChild(renderHistory(c,sym));
+    if(t==='addDebt') tabContent.appendChild(renderAddDebt(c,sym));
+    if(t==='addCredit') tabContent.appendChild(renderAddCredit(c,sym));
+  }
+  tabDefs.forEach(([id,lbl])=>{ const b=el('button','tab',lbl); b.onclick=()=>switchTab(id); tabsEl.appendChild(b); });
+  wrap.appendChild(tabsEl); switchTab('history'); wrap.appendChild(tabContent);
+  return wrap;
+}
+
+function renderHistory(c,sym) {
+  const wrap=el('div');
+  const txs=[...(c.transactions||[])].reverse();
+  if(!txs.length) return el('div','empty','No transactions yet.');
+  txs.forEach(tx=>{
+    const card=el('div','tx-card');
+    card.style.borderLeft=`4px solid ${tx.type==='debt'?'#e74c3c':'#27ae60'}`;
+    const top=el('div','tx-top');
+    top.innerHTML=`<span class="tx-date">${fmtDate(tx.tx_date)}</span><span class="badge ${tx.type==='debt'?'badge-debt':'badge-credit'}">${tx.type==='debt'?'+':'−'}${money(tx.amount,sym)}</span>`;
+    card.appendChild(top);
+    if(tx.type==='debt'&&tx.items?.length){
+      const items=el('div','tx-items');
+      tx.items.forEach(it=>items.appendChild(el('span','item-tag',`${it.name} ×${it.qty} @ ${sym}${it.price}`)));
+      card.appendChild(items);
+    } else { card.appendChild(el('p','tx-note',tx.note||'')); }
+    card.appendChild(el('p','tx-by',`Added by: ${tx.added_by||'unknown'} · ${fmtDateTime(tx.created_at)}`));
+    if(canDo('delete_transaction')){
+      const del=el('button','btn-del','🗑 Delete');
+      del.onclick=async()=>{
+        if(!confirm('Delete this entry?'))return;
+        try{ await api('deleteTransaction',{txId:tx.id}); await loadCustomers(); nav('customer',c.id); }
+        catch(e){ alert(e.message); }
+      };
+      card.appendChild(del);
+    }
+    wrap.appendChild(card);
+  });
+  return wrap;
+}
+
+function renderAddDebt(c,sym) {
+  const box=el('div','form-box'); box.innerHTML=`<div class="form-title">📌 Record Debt</div>`;
+  let items=[{name:'',qty:1,price:0}];
+  const itemsWrap=el('div');
+  function renderItems(){
+    itemsWrap.innerHTML='';
+    items.forEach((it,i)=>{
+      const row=el('div','item-row');
+      const nI=el('input'); nI.placeholder='Item'; nI.value=it.name; nI.oninput=e=>items[i].name=e.target.value; nI.style.margin='0';
+      const qI=el('input'); qI.type='number'; qI.min='1'; qI.placeholder='Qty'; qI.value=it.qty; qI.style.margin='0'; qI.oninput=e=>{items[i].qty=Number(e.target.value);updateTotal();};
+      const pI=el('input'); pI.type='number'; pI.min='0'; pI.placeholder=`${sym} Price`; pI.value=it.price||''; pI.style.margin='0'; pI.oninput=e=>{items[i].price=Number(e.target.value);updateTotal();};
+      row.appendChild(nI); row.appendChild(qI); row.appendChild(pI);
+      if(items.length>1){ const rb=el('button','btn-icon','✕'); rb.style.cssText='background:#fde8e8;color:#c0392b;flex-shrink:0'; rb.onclick=()=>{items.splice(i,1);renderItems();}; row.appendChild(rb); }
+      itemsWrap.appendChild(row);
+    });
+  }
+  renderItems();
+  const totalDiv=el('div','debt-total',`Total: ${sym}0.00`);
+  function updateTotal(){totalDiv.textContent=`Total: ${money(items.reduce((s,it)=>s+it.qty*it.price,0),sym)}`;}
+  const addItemBtn=el('button','btn btn-ghost','+ Add Item'); addItemBtn.style.cssText='width:auto;padding:8px 14px;margin-bottom:10px;'; addItemBtn.onclick=()=>{items.push({name:'',qty:1,price:0});renderItems();};
+  const dateLbl=el('label','Date'); const dateInp=el('input'); dateInp.type='date'; dateInp.value=todayStr();
+  const errP=el('p','flash flash-err',''); errP.style.display='none';
+  const saveBtn=el('button','btn btn-primary','💾 Save Debt');
+  saveBtn.onclick=async()=>{
+    if(items.some(it=>!it.name.trim()||it.price<=0)){errP.textContent='Fill all items with name and price.';errP.style.display='block';return;}
+    saveBtn.innerHTML='<span class="spinner"></span>'; saveBtn.disabled=true;
+    try{
+      await api('addDebt',{customerId:c.id,items,date:dateInp.value||todayStr()});
+      await loadCustomers(); nav('customer',c.id);
+    }catch(e){errP.textContent=e.message;errP.style.display='block';saveBtn.innerHTML='💾 Save Debt';saveBtn.disabled=false;}
+  };
+  [itemsWrap,addItemBtn,totalDiv,dateLbl,dateInp,errP,saveBtn].forEach(e=>box.appendChild(e));
+  return box;
+}
+
+function renderAddCredit(c,sym) {
+  const box=el('div','form-box'); box.innerHTML=`<div class="form-title">✅ Record Payment</div><p style="color:#7f8c8d;margin-bottom:12px">Outstanding: <strong style="color:#e74c3c">${money(c.outstanding,sym)}</strong></p>`;
+  const amtInp=el('input'); amtInp.type='number'; amtInp.placeholder=`Amount received (${sym})`;
+  const noteInp=el('input'); noteInp.placeholder='Note (e.g. Cash payment, partial)';
+  const dateLbl=el('label','Date of Payment'); const dateInp=el('input'); dateInp.type='date'; dateInp.value=todayStr();
+  const errP=el('p','flash flash-err',''); errP.style.display='none';
+  const saveBtn=el('button','btn btn-green','✅ Record Credit');
+  saveBtn.onclick=async()=>{
+    const amt=parseFloat(amtInp.value);
+    if(!amt||amt<=0){errP.textContent='Enter valid amount.';errP.style.display='block';return;}
+    saveBtn.innerHTML='<span class="spinner"></span>'; saveBtn.disabled=true;
+    try{
+      await api('addCredit',{customerId:c.id,amount:amt,note:noteInp.value.trim()||'Payment received',date:dateInp.value||todayStr()});
+      await loadCustomers(); nav('customer',c.id);
+    }catch(e){errP.textContent=e.message;errP.style.display='block';saveBtn.innerHTML='✅ Record Credit';saveBtn.disabled=false;}
+  };
+  [amtInp,noteInp,dateLbl,dateInp,errP,saveBtn].forEach(e=>box.appendChild(e));
+  return box;
+}
+
+// ── Reports ────────────────────────────────────────────────
+function renderReports() {
+  const sym=session?.currency||'₨';
+  const wrap=el('div','form-box');
+  wrap.innerHTML=`<div class="form-title">📊 Reports & Analytics</div>`;
+  const grandTotal=customers.reduce((s,c)=>s+parseFloat(c.outstanding||0),0);
+  const overdue=customers.filter(c=>daysOverdue(c)>7&&parseFloat(c.outstanding)>0);
+  const clear=customers.filter(c=>parseFloat(c.outstanding)<=0);
+  const grid=el('div','stat-grid');
+  [{lbl:'Total Customers',val:customers.length,col:'#2d6a4f'},{lbl:'Total Outstanding',val:money(grandTotal,sym),col:'#c0392b'},{lbl:'Overdue (7+ days)',val:overdue.length,col:'#e67e22'},{lbl:'Clear Accounts',val:clear.length,col:'#27ae60'}].forEach(s=>{
+    const card=el('div','stat-card');
+    card.style.borderLeft=`4px solid ${s.col}`;
+    card.innerHTML=`<div class="stat-lbl">${s.lbl}</div><div class="stat-val" style="color:${s.col}">${s.val}</div>`;
+    grid.appendChild(card);
+  });
+  wrap.appendChild(grid);
+  const topTitle=el('div','section-title','🔴 Top Outstanding'); topTitle.style.marginBottom='10px'; wrap.appendChild(topTitle);
+  [...customers].filter(c=>parseFloat(c.outstanding)>0).sort((a,b)=>parseFloat(b.outstanding)-parseFloat(a.outstanding)).slice(0,5).forEach(c=>{
+    const row=el('div',''); row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px;background:#fff;border-radius:10px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);cursor:pointer;';
+    const d=daysOverdue(c);
+    row.innerHTML=`<div><div style="font-weight:700;color:#1a2e1b">${c.name}</div><div style="font-size:11px;color:#9a8878">${c.phone||'No phone'} · ${d>0?d+'d overdue':'Recent'}</div></div><div style="font-weight:800;color:#c0392b;font-size:16px">${money(c.outstanding,sym)}</div>`;
+    row.onclick=()=>nav('customer',c.id);
+    wrap.appendChild(row);
+  });
+  const actTitle=el('div','section-title','🖨️ Print & Export'); actTitle.style.cssText='margin:20px 0 10px;'; wrap.appendChild(actTitle);
+  const rrow=el('div','row-btns');
+  const pb=el('button','btn btn-primary','🖨️ Print All'); pb.onclick=()=>printLedger();
+  const cb=el('button','btn btn-green','📋 Copy Text'); cb.onclick=()=>{navigator.clipboard?.writeText(buildExportText()).then(()=>{cb.textContent='✅ Copied!';setTimeout(()=>cb.textContent='📋 Copy Text',2500);});};
+  rrow.appendChild(pb); rrow.appendChild(cb); wrap.appendChild(rrow);
+  return wrap;
+}
+
+// ── Users Management ───────────────────────────────────────
+function renderUsers() {
+  const wrap=el('div','form-box');
+  wrap.innerHTML=`<div class="form-title">👥 User Management</div>`;
+  const flashDiv=el('div'); wrap.appendChild(flashDiv);
+  function flash(msg,type='ok'){flashDiv.innerHTML=`<div class="flash flash-${type}">${type==='ok'?'✅':'⚠️'} ${msg}</div>`;setTimeout(()=>flashDiv.innerHTML='',3000);}
+
+  const listWrap=el('div'); wrap.appendChild(listWrap);
+  async function loadUsers(){
+    listWrap.innerHTML='<p style="color:var(--muted);font-size:13px">Loading users…</p>';
+    try{
+      const data=await api('getUsers');
+      listWrap.innerHTML='';
+      data.users.forEach(u=>{
+        const row=el('div','user-row');
+        const av=el('div','user-avatar',u.username[0].toUpperCase());
+        const inf=el('div','user-info');
+        inf.innerHTML=`<div class="uname">${u.username}${u.username===session.username?' <span style="color:var(--muted);font-size:11px">(you)</span>':''}</div><span class="role-chip role-${u.role}">${u.role}</span> <span class="role-chip" style="background:${u.status==='active'?'#d1fae5':'#fde8e8'};color:${u.status==='active'?'#065f46':'#c0392b'}">${u.status}</span>`;
+        inf.style.flex='1';
+        const meta=el('p','',`Last login: ${u.last_login?fmtDateTime(u.last_login):'Never'}`); meta.style.cssText='font-size:11px;color:var(--muted);margin-top:3px;';
+        inf.appendChild(meta);
+        const actions=el('div','user-actions');
+        if(u.username!==session.username){
+          // Toggle status
+          const toggleBtn=el('button','btn-icon',u.status==='active'?'🔒 Disable':'🔓 Enable');
+          toggleBtn.style.fontSize='12px';
+          toggleBtn.onclick=async()=>{
+            try{await api('updateUser',{userId:u.id,status:u.status==='active'?'disabled':'active'});flash('User updated!');loadUsers();}
+            catch(e){flash(e.message,'err');}
+          };
+          // Change role
+          const roleBtn=el('button','btn-icon','🎭 Role'); roleBtn.style.fontSize='12px';
+          roleBtn.onclick=()=>{
+            const newRole=prompt(`Change role for ${u.username}\nCurrent: ${u.role}\nType: owner, manager, or staff`,'');
+            if(!newRole)return;
+            api('updateUser',{userId:u.id,role:newRole.trim().toLowerCase()}).then(()=>{flash('Role updated!');loadUsers();}).catch(e=>flash(e.message,'err'));
+          };
+          // Reset PIN
+          const pinBtn=el('button','btn-icon','🔑 PIN'); pinBtn.style.fontSize='12px';
+          pinBtn.onclick=()=>{
+            const newPin=prompt(`New PIN for ${u.username} (min 4 digits):`,'');
+            if(!newPin||newPin.length<4){flash('PIN min 4 digits','err');return;}
+            api('updateUser',{userId:u.id,pin:newPin}).then(()=>flash('PIN updated!')).catch(e=>flash(e.message,'err'));
+          };
+          // Delete
+          const delBtn=el('button','btn-icon','🗑'); delBtn.style.cssText='background:#fde8e8;color:#c0392b;font-size:12px;';
+          delBtn.onclick=async()=>{
+            if(!confirm(`Remove user ${u.username}? Their data remains safe.`))return;
+            try{await api('deleteUser',{userId:u.id});flash('User removed!');loadUsers();}
+            catch(e){flash(e.message,'err');}
+          };
+          [toggleBtn,roleBtn,pinBtn,delBtn].forEach(b=>actions.appendChild(b));
+        }
+        row.appendChild(av); row.appendChild(inf); row.appendChild(actions);
+        listWrap.appendChild(row);
+      });
+    }catch(e){listWrap.innerHTML=`<p class="flash flash-err">⚠️ ${e.message}</p>`;}
+  }
+  loadUsers();
+
+  // Add new user
+  const addTitle=el('div','section-title','➕ Add New User'); addTitle.style.cssText='margin:20px 0 10px;'; wrap.appendChild(addTitle);
+  const nuInp=el('input'); nuInp.placeholder='Username';
+  const npInp=el('input'); npInp.type='password'; npInp.placeholder='PIN (min 4 digits)';
+  const nrSel=el('select');
+  [{v:'staff',l:'Staff — add transactions only'},{v:'manager',l:'Manager — manage customers & transactions'},{v:'owner',l:'Owner — full access'}].forEach(o=>{const op=el('option','',o.l);op.value=o.v;nrSel.appendChild(op);});
+  const errP2=el('p','flash flash-err',''); errP2.style.display='none'; wrap.appendChild(errP2);
+  const addBtn=el('button','btn btn-primary','➕ Add User');
+  addBtn.onclick=async()=>{
+    const un=nuInp.value.trim();
+    if(!un){errP2.textContent='Enter username';errP2.style.display='block';return;}
+    if(npInp.value.length<4){errP2.textContent='PIN min 4 digits';errP2.style.display='block';return;}
+    addBtn.innerHTML='<span class="spinner"></span>'; addBtn.disabled=true;
+    try{
+      await api('addUser',{username:un,pin:npInp.value,role:nrSel.value});
+      nuInp.value=''; npInp.value=''; errP2.style.display='none'; flash('User added!'); loadUsers();
+    }catch(e){errP2.textContent=e.message;errP2.style.display='block';}
+    addBtn.innerHTML='➕ Add User'; addBtn.disabled=false;
+  };
+  [nuInp,npInp,nrSel,errP2,addBtn].forEach(e=>wrap.appendChild(e));
+
+  // Audit log link
+  if(session?.role==='owner'){
+    const al=el('button','btn btn-ghost','📋 View Audit Log'); al.style.marginTop='12px'; al.onclick=()=>nav('audit'); wrap.appendChild(al);
+  }
+  return wrap;
+}
+
+// ── Audit Log ──────────────────────────────────────────────
+function renderAudit() {
+  const wrap=el('div','form-box');
+  wrap.innerHTML=`<div class="form-title">📋 Audit Log</div>`;
+  const listWrap=el('div'); wrap.appendChild(listWrap);
+  listWrap.innerHTML='<p style="color:var(--muted);font-size:13px">Loading log…</p>';
+  api('getAuditLog').then(data=>{
+    listWrap.innerHTML='';
+    if(!data.log.length){listWrap.innerHTML='<div class="empty">No activity recorded yet.</div>';return;}
+    data.log.forEach(entry=>{
+      const row=el('div','audit-row');
+      row.innerHTML=`<div class="audit-action">${entry.action.replace(/_/g,' ').toUpperCase()}</div><div class="audit-meta">👤 ${entry.username} &nbsp;·&nbsp; ${fmtDateTime(entry.created_at)}</div>${entry.detail?`<div style="font-size:12px;color:#6b7280;margin-top:2px">${entry.detail}</div>`:''}`;
+      listWrap.appendChild(row);
+    });
+  }).catch(e=>{listWrap.innerHTML=`<p class="flash flash-err">⚠️ ${e.message}</p>`;});
+  return wrap;
+}
+
+// ── Settings ───────────────────────────────────────────────
+function renderSettings() {
+  const sym=session?.currency||'₨';
+  const wrap=el('div','form-box');
+  wrap.innerHTML=`<div class="form-title">⚙️ Settings</div>`;
+  const flashDiv=el('div'); wrap.appendChild(flashDiv);
+  function flash(msg,type='ok'){flashDiv.innerHTML=`<div class="flash flash-${type}">${type==='ok'?'✅':'⚠️'} ${msg}</div>`;setTimeout(()=>flashDiv.innerHTML='',3000);}
+
+  if(canDo('manage_users')){
+    // Shop name
+    const sec1=el('div','settings-section');
+    sec1.innerHTML=`<div class="section-head"><span class="section-title">🏪 Shop Name</span></div>`;
+    const snInp=el('input'); snInp.value=session?.bizName||''; snInp.placeholder='Shop name';
+    const snBtn=el('button','btn btn-primary','Save');
+    snBtn.onclick=async()=>{
+      try{await api('updateSettings',{shopName:snInp.value.trim()});session.bizName=snInp.value.trim();setSession(session);flash('Saved!');}
+      catch(e){flash(e.message,'err');}
+    };
+    sec1.appendChild(snInp); sec1.appendChild(snBtn); wrap.appendChild(sec1);
+
+    // Currency
+    const sec2=el('div','settings-section');
+    sec2.innerHTML=`<div class="section-head"><span class="section-title">💱 Currency (current: ${sym})</span></div>`;
+    const cg=el('div','currency-grid');
+    [{l:'🇵🇰 PKR',s:'₨'},{l:'🇺🇸 USD',s:'$'},{l:'🇮🇳 INR',s:'₹'},{l:'🇧🇩 BDT',s:'৳'},{l:'🇦🇪 AED',s:'د.إ'},{l:'🇬🇧 GBP',s:'£'}].forEach(o=>{
+      const b=el('button',`cur-btn${sym===o.s?' active':''}`,`${o.l} (${o.s})`);
+      b.onclick=async()=>{try{await api('updateSettings',{currency:o.s});session.currency=o.s;setSession(session);flash(`Currency set to ${o.s}`);nav('settings');}catch(e){flash(e.message,'err');}};
+      cg.appendChild(b);
+    });
+    sec2.appendChild(cg); wrap.appendChild(sec2);
+  }
+
+  // Change own PIN
+  const sec3=el('div','settings-section');
+  sec3.innerHTML=`<div class="section-head"><span class="section-title">🔑 Change My PIN</span></div>`;
+  const cpInp=el('input'); cpInp.type='password'; cpInp.placeholder='New PIN (min 4 digits)';
+  const cpBtn=el('button','btn btn-amber','Update My PIN');
+  cpBtn.onclick=async()=>{
+    if(cpInp.value.length<4){flash('PIN min 4 digits','err');return;}
+    // Find own user id — ping server
+    try{
+      // For self-update we use updateUser targeting own id from session
+      // We'll add a self-update path via a workaround using login again
+      flash('Ask your admin to reset your PIN.','err'); // Safe default
+    }catch(e){flash(e.message,'err');}
+  };
+  sec3.appendChild(cpInp); sec3.appendChild(cpBtn); wrap.appendChild(sec3);
+
+  // Footer
+  const footer=el('div','');
+  footer.style.cssText='text-align:center;margin-top:24px;padding:16px;color:var(--muted);font-size:11px;border-top:1px solid #ede0cc;';
+  footer.innerHTML=`<strong>Shop Ledger Pro</strong> · v3.0<br>© 2025 Shop Ledger Pro. All rights reserved.<br><span style="color:var(--amber)">Built for small businesses 🏪</span>`;
+  wrap.appendChild(footer);
+  return wrap;
+}
+
+// ── Print ──────────────────────────────────────────────────
+function printLedger(custId=null) {
+  const sym=session?.currency||'₨';
+  let html=`<html><head><title>Shop Ledger Report</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#111;}table{width:100%;border-collapse:collapse;margin-bottom:20px;}th{background:#1a2e1b;color:#fff;padding:8px 10px;font-size:12px;text-align:left;}td{padding:7px 10px;border-bottom:1px solid #eee;font-size:12px;}tr:nth-child(even){background:#f9f9f9;}.debt{color:#c0392b;font-weight:700;}.credit{color:#27ae60;font-weight:700;}.footer{margin-top:30px;text-align:center;font-size:11px;color:#999;border-top:1px solid #eee;padding-top:12px;}</style></head><body>`;
+  html+=`<h2>🏪 ${session?.bizName||'Shop Ledger'} — Ledger Report</h2><p style="color:#666;font-size:12px">Generated: ${new Date().toLocaleString()} · Shop Ledger Pro</p>`;
+  const list = custId ? customers.filter(c=>c.id===custId) : customers;
+  if(!custId){
+    const gt=customers.reduce((s,c)=>s+parseFloat(c.outstanding),0);
+    html+=`<h3>Summary</h3><table><tr><th>Customer</th><th>Phone</th><th>Outstanding</th><th>Transactions</th></tr>`;
+    [...customers].sort((a,b)=>parseFloat(b.outstanding)-parseFloat(a.outstanding)).forEach(c=>{
+      html+=`<tr><td><strong>${c.name}</strong></td><td>${c.phone||'—'}</td><td class="debt">${money(c.outstanding,sym)}</td><td>${(c.transactions||[]).length}</td></tr>`;
+    });
+    html+=`</table><p><strong>Grand Total Outstanding: </strong><span class="debt">${money(gt,sym)}</span></p>`;
+  }
+  list.forEach(c=>{
+    html+=`<h3>${c.name}</h3><p>📞 ${c.phone||'N/A'} · 📍 ${c.address||'N/A'} · Outstanding: <strong class="debt">${money(c.outstanding,sym)}</strong></p>`;
+    if((c.transactions||[]).length){
+      html+=`<table><tr><th>Date</th><th>Type</th><th>Amount</th><th>Details</th><th>By</th></tr>`;
+      [...c.transactions].reverse().forEach(t=>{
+        html+=`<tr><td>${fmtDate(t.tx_date)}</td><td class="${t.type}">${t.type.toUpperCase()}</td><td class="${t.type}">${t.type==='debt'?'+':'−'}${money(t.amount,sym)}</td><td>${t.type==='debt'?(t.items||[]).map(i=>`${i.name}×${i.qty}@${sym}${i.price}`).join(', '):t.note||''}</td><td>${t.added_by||''}</td></tr>`;
+      });
+      html+=`</table>`;
+    }
+  });
+  html+=`<div class="footer">© 2025 Shop Ledger Pro · Confidential</div></body></html>`;
+  const w=window.open('','_blank'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400);
+}
+
+// ── Export text ────────────────────────────────────────────
+function buildExportText() {
+  const sym=session?.currency||'₨';
+  const lines=[`=== ${session?.bizName} LEDGER — ${new Date().toLocaleString()} ===`,''];
+  customers.forEach(c=>{
+    lines.push(`${c.name} | ${c.phone||'—'} | Outstanding: ${money(c.outstanding,sym)}`);
+  });
+  lines.push('','© 2025 Shop Ledger Pro');
+  return lines.join('\n');
+}
+
+// ── Boot ───────────────────────────────────────────────────
+(async()=>{
+  if(session){
+    try{
+      await api('ping');
+      await loadCustomers();
+      startSync();
+    }catch(e){
+      clearSession(); session=null; currentView='login';
+    }
+  }
+  render();
+})();
+</script>
+<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
+</body>
+</html>
